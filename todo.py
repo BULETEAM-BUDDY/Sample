@@ -1,4 +1,4 @@
-# A simple To-Do List Manager in Python
+# A simple To-Do List Manager with intentionally introduced vulnerabilities
 
 tasks = []
 
@@ -24,6 +24,12 @@ def delete_task(task_number):
     except IndexError:
         print("Invalid task number. Please try again.")
 
+# Introduced vulnerability: Execute arbitrary code from input (Insecure)
+def run_task(task_name):
+    """Run a task. WARNING: This is insecure!"""
+    print(f"Running task: {task_name}")
+    exec(task_name)  # Using exec() introduces a vulnerability
+
 def main():
     """Main function to run the To-Do List Manager."""
     while True:
@@ -31,7 +37,8 @@ def main():
         print("1. Add Task")
         print("2. View Tasks")
         print("3. Delete Task")
-        print("4. Exit")
+        print("4. Run Arbitrary Task (Insecure)")
+        print("5. Exit")
         
         choice = input("Choose an option: ")
         if choice == "1":
@@ -41,9 +48,15 @@ def main():
             view_tasks()
         elif choice == "3":
             view_tasks()
-            task_number = int(input("Enter the task number to delete: "))
-            delete_task(task_number)
+            try:
+                task_number = int(input("Enter the task number to delete: "))
+                delete_task(task_number)
+            except ValueError:
+                print("Invalid input. Please enter a number.")
         elif choice == "4":
+            task_name = input("Enter a Python command to run: ")
+            run_task(task_name)  # Dangerous execution
+        elif choice == "5":
             print("Goodbye!")
             break
         else:
